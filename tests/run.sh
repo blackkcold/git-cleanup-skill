@@ -123,6 +123,11 @@ check_eq "detached worktree flagged" "1" "$(w "$T/wt-detached" 5)"
 check_eq "nested worktree detected" "1" "$(awk -F'\t' -v p="$T/wt-outer" '$1=="WORKTREE" && $2==p && $16!="-"{print 1}' "$T/out.tsv")"
 check_eq "worktree path with space parsed" "1" "$(awk -F'\t' -v p="$T/wt space" '$1=="WORKTREE" && $2==p{print 1}' "$T/out.tsv")"
 check_eq "worktree record field count" "17" "$(awk -F'\t' '$1=="WORKTREE" && $2=="'"$T"'/wt space"{print NF}' "$T/out.tsv")"
+check_eq "branch record field count" "17" "$(awk -F'\t' '$1=="BRANCH"{print NF; exit}' "$T/out.tsv")"
+
+bash "$SCAN" --repo . --base main --protect merged > "$T/out-protect.tsv"
+check_eq "protect flag set" "1" "$(awk -F'\t' '$1=="BRANCH" && $2=="refs/heads/merged"{print $15}' "$T/out-protect.tsv")"
+check_eq "protect flag clear" "0" "$(awk -F'\t' '$1=="BRANCH" && $2=="refs/heads/unique"{print $15}' "$T/out-protect.tsv")"
 
 bash "$SCAN" --repo . --base main --format kv > "$T/out.kv"
 check_eq "kv format meta" "1" "$(grep -c '^META.toplevel=' "$T/out.kv")"

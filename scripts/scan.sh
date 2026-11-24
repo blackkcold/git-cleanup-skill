@@ -173,10 +173,10 @@ while IFS=$'\x1f' read -r ref sha upstream track epoch subject; do
   fi
   [ -n "$track" ] || track="-"
   subject=$(printf '%s' "$subject" | tr '\t\n\037' '   ')
-  printf 'BRANCH\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+  printf 'BRANCH\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
     "$ref" "$sha" "${upstream:--}" "$track" "$ahead" "$behind" "$merged" \
     "$merge_commits" "$cherry_plus" "$cherry_minus" "$content_eq" "$tree" \
-    "$wt_path" "${epoch:-0}" "$subject" >> "$OUT"
+    "$wt_path" "$protected" "${epoch:-0}" "$subject" >> "$OUT"
   branch_count=$((branch_count + 1))
 done < "$BRANCH_FILE"
 
@@ -258,7 +258,7 @@ fi
 { printf '%s\n' "$META"; cat "$OUT"; } | awk -F'\t' '
 BEGIN {
   meta="toplevel git_version shallow bare base_arg base_ref base_sha base_resolved_via head_ref head_sha detached op_in_progress fetch_mtime branch_count worktree_count ignored_bytes_total degraded elapsed_ms"
-  branch="refname sha upstream upstream_track ahead_commits behind_commits merged merge_commits cherry_plus cherry_minus content_eq tree worktree_path last_commit_epoch subject"
+  branch="refname sha upstream upstream_track ahead_commits behind_commits merged merge_commits cherry_plus cherry_minus content_eq tree worktree_path protect_match last_commit_epoch subject"
   worktree="path head branch detached locked prunable tracked_dirty untracked_count ignored_count ignored_bytes assume_unchanged skip_worktree submodule_dirty submodule_uninit nested_in exists"
   remote="remote refname sha merged"
 }
