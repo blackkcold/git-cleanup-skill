@@ -81,7 +81,12 @@ head_ref=$(git symbolic-ref --quiet --short HEAD 2>/dev/null || echo "(detached)
 head_sha=$(git rev-parse --verify HEAD 2>/dev/null || echo "-")
 detached=0; [ "$head_ref" = "(detached)" ] && detached=1
 
-fetch_mtime=$(stat -f %m "$GD/FETCH_HEAD" 2>/dev/null || stat -c %Y "$GD/FETCH_HEAD" 2>/dev/null || echo 0)
+fetch_mtime=0
+if [ -e "$GD/FETCH_HEAD" ]; then
+  fetch_mtime=$(stat -f %m "$GD/FETCH_HEAD" 2>/dev/null) \
+    || fetch_mtime=$(stat -c %Y "$GD/FETCH_HEAD" 2>/dev/null) \
+    || fetch_mtime=0
+fi
 
 # --- base resolution -------------------------------------------------------
 resolve_base() {
